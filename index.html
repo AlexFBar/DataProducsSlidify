@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tooth Growth Data Inference</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Tooth Growth Data Inference">
+  <meta name="author" content="Alexandre Barros (AlexFBar) - november/2015">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Tooth Growth Data Inference</h1>
+    <h2>Demonstration the effect of doses of Vitamin C and Orange Juice in the lenght of odontobasts (teeth) in each of 10 guinea pigs.</h2>
+    <p>Alexandre Barros (AlexFBar) - november/2015<br/>Data Scientist</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>The Idea</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The idea of my application is simple like the steps below:</p>
+
+<ol>
+<li>I choose a result of a Project class from Coursera to make a simple appication</li>
+<li>The Peer Assessment Part 2 of Data Inference course was choosen</li>
+<li>The project conclusion is a boxplot with different dosages in the dataset</li>
+<li>The parameter of my application can be the dosage</li>
+<li>The other parameter to transform a dinamic boxplot is the scale of y-axis</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>The Dataset</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The Dataset can be load</p>
+
+<pre><code class="r">data(&quot;ToothGrowth&quot;)
+</code></pre>
+
+<p>The Structure of Dataset</p>
+
+<pre><code class="r">str(ToothGrowth)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    60 obs. of  3 variables:
+##  $ len : num  4.2 11.5 7.3 5.8 6.4 10 11.2 11.2 5.2 7 ...
+##  $ supp: Factor w/ 2 levels &quot;OJ&quot;,&quot;VC&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ dose: num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>The Application (ui.R)</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">shinyUI(fluidPage(
+  # Application title
+  # Application documentation
+  sidebarLayout(
+    sidebarPanel(
+      radioButtons(&quot;dose&quot;, &quot;Dosage of supplements:&quot;,
+        list(&quot;0.5 mg&quot; = 0.5,
+             &quot;1.0 mg&quot; = 1.0,
+             &quot;2.0 mg&quot; = 2.0)),
+        sliderInput(&quot;theethrange&quot;, &quot;Scale range of Y-axis (Tooth Lenght):&quot;, 
+         min=0, max=50, value=c(0,50),step=1)
+    ),
+    mainPanel(
+      plotOutput(&quot;distPlot&quot;)
+      #Conclusion
+  )
+)))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>The Application (server.R)</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(shiny)
+library(ggplot2)
+data(&quot;ToothGrowth&quot;)
+
+shinyServer(function(input, output) {
+
+        output$distPlot &lt;- renderPlot({
+                doses &lt;- input$dose
+                ggplot(ToothGrowth[ToothGrowth$dose==doses,],
+                        aes(x=factor(supp), y=len, colour=factor(supp)))+
+                        facet_grid(.~dose)+
+                        geom_boxplot()+
+                        coord_cartesian(ylim = input$theethrange)+
+                        ggtitle(&quot;Exploratory from Tooth Growth by Supplement&quot;)+
+                        labs(y=&quot;Tooth Length&quot;, x=&quot;Supplement&quot;)
+        })
+
+})
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Result</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><a href="https://alexfbar.shinyapps.io/app02">https://alexfbar.shinyapps.io/app02</a></p>
+
+<p><img src="fig01.jpg" alt=""></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='The Idea'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='The Dataset'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='The Application (ui.R)'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='The Application (server.R)'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Result'>
+         5
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
